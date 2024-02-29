@@ -1,7 +1,7 @@
 #include "Entity.h"
 
-Entity::Entity(const std::string& tag, size_t id)
-	: m_tag(tag), m_id(id)
+Entity::Entity(EntityType type, size_t id)
+	: m_type(type), m_id(id)
 {
 }
 
@@ -123,9 +123,9 @@ void Entity::destroy()
 	m_isActive = false;
 }
 
-const std::string& Entity::tag() const
+EntityType Entity::type() const
 {
-	return m_tag;
+	return m_type;
 }
 
 size_t Entity::id() const

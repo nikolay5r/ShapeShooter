@@ -2,10 +2,10 @@
 #include "Entity.h"
 
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 typedef std::vector<std::shared_ptr<Entity>> EntityVector;
-typedef std::map<std::string, EntityVector> EntityMap;
+typedef std::unordered_map<EntityType, EntityVector, std::hash<int>> EntityMap;
 
 class EntityManager 
 {
@@ -17,8 +17,8 @@ private:
 
 	void removeInactiveEntities();
 public:
-	std::shared_ptr<Entity> addEntity(const std::string& tag);
+	std::shared_ptr<Entity> addEntity(EntityType type);
 	const EntityVector& getEntities() const;
-	const EntityVector& getEntities(const std::string& tag) const;
+	const EntityVector& getEntities(EntityType type) const;
 	void update();
 };

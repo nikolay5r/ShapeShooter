@@ -6,15 +6,11 @@
 #include <sstream>
 #include <iostream>
 
-const std::string WINDOW = "Window";
-const std::string FONT = "Font";
-const std::string PLAYER = "Player";
-const std::string ENEMY = "Enemy";
-const std::string BULLET = "Bullet";
-
-const std::string PLAYER_TAG = "Player";
-const std::string ENEMY_TAG = "Enemy";
-const std::string BULLET_TAG = "Bullet";
+const std::string WINDOW_KEYWORD = "Window";
+const std::string FONT_KEYWORD = "Font";
+const std::string PLAYER_KEYWORD = "Player";
+const std::string ENEMY_KEYWORD = "Enemy";
+const std::string BULLET_KEYWORD = "Bullet";
 
 const unsigned SCORE_MULTIPLIER = 100;
 const unsigned MAX_ALPHA_VALUE = 255;
@@ -43,7 +39,7 @@ Game::Game(const std::string& configFilePath)
 
 void Game::createPlayer()
 {
-	auto player = m_entityManager.addEntity(PLAYER_TAG);
+	auto player = m_entityManager.addEntity(EntityType::PLAYER);
 
 	player->setCollisionComponent(CollisionComponent(playerConfig.collisionRadius));
 	player->setInputComponent(InputComponent());
@@ -88,23 +84,23 @@ void Game::setupConfigs(std::ifstream& configFile)
 			break;
 		}
 
-		if (keyword == WINDOW)
+		if (keyword == WINDOW_KEYWORD)
 		{
 			setupWindowConfig(ss);
 		}
-		else if (keyword == FONT)
+		else if (keyword == FONT_KEYWORD)
 		{
 			setupFontConfig(ss);
 		}
-		else if (keyword == PLAYER)
+		else if (keyword == PLAYER_KEYWORD)
 		{
 			setupPlayerConfig(ss);
 		}
-		else if (keyword == ENEMY)
+		else if (keyword == ENEMY_KEYWORD)
 		{
 			setupEnemyConfig(ss);
 		}
-		else if (keyword == BULLET)
+		else if (keyword == BULLET_KEYWORD)
 		{
 			setupBulletConfig(ss);
 		}
@@ -198,7 +194,7 @@ void Game::createEnemy(float x,
 	const sf::Vector2f& velocity,
 	float speed)
 {
-	auto enemy = m_entityManager.addEntity(ENEMY_TAG);
+	auto enemy = m_entityManager.addEntity(EntityType::ENEMY);
 	enemy->setCollisionComponent(CollisionComponent(enemyConfig.collisionRadius));
 	enemy->setShapeComponent(
 		ShapeComponet(
@@ -265,7 +261,7 @@ void Game::createSmallEnemies(std::shared_ptr<Entity> entity)
 	float startDegree = 0;
 	for (size_t i = 0; i < vertices; i++, startDegree += degreeToSpawn)
 	{
-		auto smallEnemy = m_entityManager.addEntity(ENEMY_TAG);
+		auto smallEnemy = m_entityManager.addEntity(EntityType::ENEMY);
 		smallEnemy->setCollisionComponent(CollisionComponent(enemyConfig.smallCollisionRadius));
 		smallEnemy->setShapeComponent(
 			ShapeComponet(
@@ -345,7 +341,7 @@ void Game::createBullet(const sf::Vector2f& destination)
 	Utils::normalize(direction);
 
 	setBulletComponents(
-		m_entityManager.addEntity(BULLET),
+		m_entityManager.addEntity(EntityType::BULLET),
 		spawnPosition,
 		bulletConfig,
 		sf::Vector2f(bulletConfig.speed * direction.x, bulletConfig.speed * direction.y));
@@ -423,7 +419,7 @@ void Game::movementSystem()
 		auto cTransform = e->getTransformComponent();
 		if (cShape && cTransform)
 		{
-			if (e->tag() == ENEMY_TAG)
+			if (e->type() == EntityType::ENEMY)
 			{
 				sf::Vector2f futurePosition = cTransform->position() + cTransform->velocity();
 				sf::Vector2f currentVelocity = cTransform->velocity();
@@ -481,8 +477,8 @@ void Game::userInputSystem()
 
 void Game::collisionSystem()
 {
-	auto bullets = m_entityManager.getEntities(BULLET_TAG);
-	auto enemies = m_entityManager.getEntities(ENEMY_TAG);
+	auto bullets = m_entityManager.getEntities(EntityType::BULLET);
+	auto enemies = m_entityManager.getEntities(EntityType::ENEMY);
 
 	for (auto& enemy : enemies)
 	{
@@ -508,8 +504,6 @@ void Game::collisionSystem()
 			{
 				createSmallEnemies(enemy);
 				enemy->destroy();
-				m_player->getTransformComponent()
-					->setPosition(sf::Vector2f(m_width / 2, m_height / 2));
 				m_score = 0;
 			}
 		}
@@ -530,7 +524,7 @@ void Game::createSpecialWeapon()
 	for (size_t i = 0; i < SPECIAL_BULLETS_FIRED; i++, startAngle += decrease)
 	{
 		setBulletComponents(
-			m_entityManager.addEntity(BULLET_TAG),
+			m_entityManager.addEntity(EntityType::BULLET),
 			m_player->getTransformComponent()->position(),
 			bulletConfig,
 			Utils::findVelocity(bulletConfig.speed, startAngle)

@@ -6,12 +6,18 @@
 
 class EntityManager;
 
+enum EntityType {
+	PLAYER,
+	ENEMY,
+	BULLET
+};
+
 class Entity
 {
 private:
 	bool m_isActive = true;
 	size_t m_id;
-	std::string m_tag;
+	EntityType m_type;
 
 	std::shared_ptr<TransformComponent> c_transform;
 	std::shared_ptr<LifespanComponent> c_lifeSpan;
@@ -20,7 +26,7 @@ private:
 	std::shared_ptr<ShapeComponet> c_shape;
 	std::shared_ptr<CollisionComponent> c_collision;
 
-	Entity(const std::string& tag, size_t id);
+	Entity(EntityType type, size_t id);
 public:
 
 	const std::shared_ptr<const TransformComponent>& getTransformComponent() const;
@@ -45,7 +51,7 @@ public:
 	void setCollisionComponent(const CollisionComponent& collisionComponent);
 
 	bool isActive() const;
-	const std::string& tag() const;
+	EntityType type() const;
 	size_t id() const;
 	void destroy();
 

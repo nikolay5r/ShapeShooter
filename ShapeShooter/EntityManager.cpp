@@ -22,9 +22,9 @@ void EntityManager::removeInactiveEntities()
 	}
 }
 
-std::shared_ptr<Entity> EntityManager::addEntity(const std::string& tag)
+std::shared_ptr<Entity> EntityManager::addEntity(EntityType type)
 {
-	m_entitiesToAdd.push_back(std::shared_ptr<Entity>(new Entity(tag, m_totalEntities)));
+	m_entitiesToAdd.push_back(std::shared_ptr<Entity>(new Entity(type, m_totalEntities)));
 	return m_entitiesToAdd.back();
 }
 
@@ -33,9 +33,9 @@ const EntityVector& EntityManager::getEntities() const
 	return m_entities;
 }
 
-const EntityVector& EntityManager::getEntities(const std::string& tag) const
+const EntityVector& EntityManager::getEntities(EntityType type) const
 {
-	auto it = m_entitiesByType.find(tag);
+	auto it = m_entitiesByType.find(type);
 	if (it != m_entitiesByType.end()) {
 		return it->second;
 	}
@@ -48,7 +48,7 @@ void EntityManager::update()
 	for (auto e: m_entitiesToAdd)
 	{
 		m_entities.push_back(e);
-		m_entitiesByType[e->m_tag].push_back(e);
+		m_entitiesByType[e->m_type].push_back(e);
 	}
 
 	m_entitiesToAdd.clear();
